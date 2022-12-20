@@ -51,26 +51,6 @@ class Schedule(JSONSerializable['Schedule']):
         )][self._data_columns]
 
     @property
-    def to_validation_json(self, output_path) -> None:
-        """
-        Prepare Schedule object validation and saves schedule object to json
-        :output_path: Full path to save.
-        """
-        start = '2022-12-20'
-        end = '2027-12-31'
-        merged_schedule = self.merged_stages_datetime_df(start)
-        grouped_schedule = remove_service_tasks(merged_schedule)
-        schedule_name_base = output_path.split('/')[-1][:-5]
-
-        schedule_json = schedule_to_json(schedule_uploading_mode='from_df', schedule_df=grouped_schedule,
-                                         schedule_name=schedule_name_base, deadline_date=end)
-        path_to_json = output_path
-        with open(path_to_json, "w",
-                  encoding='utf-8') as fp:
-            json.dump(schedule_json, fp, ensure_ascii=False)
-
-
-    @property
     def works(self) -> Iterable[ScheduledWork]:
         """
         Enumerates ScheduledWorks in the Schedule.
@@ -139,6 +119,24 @@ class Schedule(JSONSerializable['Schedule']):
                       'start_offset': 'start', 'finish_offset': 'finish'}, axis=1) \
             .drop(['start_', 'finish_'], axis=1)
         return r
+
+    def to_validation_json(self, output_path) -> None:
+        """
+        Prepare Schedule object validation and saves schedule object to json
+        :output_path: Full path to save.
+        """
+        start = '2022-12-20'
+        end = '2027-12-31'
+        merged_schedule = self.merged_stages_datetime_df(start)
+        grouped_schedule = remove_service_tasks(merged_schedule)
+        schedule_name_base = output_path.split('/')[-1][:-5]
+
+        schedule_json = schedule_to_json(schedule_uploading_mode='from_df', schedule_df=grouped_schedule,
+                                         schedule_name=schedule_name_base, deadline_date=end)
+        path_to_json = output_path
+        with open(path_to_json, "w",
+                  encoding='utf-8') as fp:
+            json.dump(schedule_json, fp, ensure_ascii=False)
 
     @staticmethod
     def from_scheduled_works(works: Iterable[ScheduledWork],

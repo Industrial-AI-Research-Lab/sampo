@@ -73,7 +73,7 @@ def remove_service_tasks(service_schedule_df: pd.DataFrame) -> pd.DataFrame:
     """
     schedule_df = service_schedule_df.copy()
 
-    service_df = schedule_df.loc[:, 'task_name'].str.contains('start|finish')
+    service_df = schedule_df.loc[:, 'task_name'].str.contains('start|finish|Очередь')
 
     # Prepare list with service tasks ids
     service_tasks_ids = set(schedule_df.loc[service_df].loc[:, 'task_id'])
