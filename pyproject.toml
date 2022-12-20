@@ -1,12 +1,10 @@
 [tool.poetry]
 name = "sampo"
-version = "0.1.1.80"
+version = "0.1.1.82"
 description = ""
 authors = ["iAirLab <iairlab@yandex.ru>"]
 license = "BSD-3-Clause"
 #readme = "README.rst"
-license = "GPLv3"
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
