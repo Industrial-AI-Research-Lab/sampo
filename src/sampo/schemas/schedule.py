@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from functools import partial, lru_cache
 from typing import Tuple, List, Dict, Iterable, Union, Set
@@ -10,7 +11,7 @@ from sampo.schemas.serializable import JSONSerializable, T
 from sampo.schemas.time import Time
 from sampo.schemas.works import WorkUnit
 from sampo.utilities.datetime import add_time_delta
-from sampo.utilities.schedule import fix_split_tasks
+from sampo.utilities.schedule import fix_split_tasks, remove_service_tasks, schedule_to_json
 
 ResourceSchedule = Dict[str, List[Tuple[Time, Time]]]
 ScheduleWorkDict = Dict[str, ScheduledWork]
@@ -48,6 +49,25 @@ class Schedule(JSONSerializable['Schedule']):
             lambda row: row[self._scheduled_work_column].work_unit.is_service_unit,
             axis=1
         )][self._data_columns]
+
+    @property
+    def to_validation_json(self, output_path, schedule_name_base) -> None:
+        """
+        Prepare Schedule object validation and saves schedule object to json
+        :output_path: Full path to save.
+        """
+        start = '2022-12-20'
+        end = '2027-12-31'
+        merged_schedule = self.merged_stages_datetime_df(start)
+        grouped_schedule = remove_service_tasks(merged_schedule)
+
+        schedule_json = schedule_to_json(schedule_uploading_mode='from_df', schedule_df=grouped_schedule,
+                                         schedule_name=schedule_name_base, deadline_date=end)
+        path_to_json = output_path + schedule_name_base + '_schedule.json'
+        with open(path_to_json, "w",
+                  encoding='utf-8') as fp:
+            json.dump(schedule_json, fp, ensure_ascii=False)
+
 
     @property
     def works(self) -> Iterable[ScheduledWork]:
